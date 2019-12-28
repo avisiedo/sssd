@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: fedora-28
+    runs-on: fedora:latest
 
     steps:
     - uses: actions/checkout@v1
