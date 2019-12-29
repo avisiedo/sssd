@@ -73,6 +73,7 @@ RUN dnf -y install autoconf \
                    systemd-devel \
                    systemtap-sdt-devel \
                    uid_wrapper \
+                   cppcheck \
     && dnf -y clean all
 
 RUN groupadd -g $UID developer \
