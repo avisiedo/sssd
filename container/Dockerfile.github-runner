@@ -1,0 +1,19 @@
+FROM sssd/sssd-devel
+
+MAINTAINER SSSD Maintainers <sssd-maint@redhat.com>
+
+ARG TOKEN
+
+USER root
+
+RUN mkdir -p /github/actions-runner && cd /github/actions-runner \
+    && curl -O https://githubassets.azureedge.net/runners/2.163.1/actions-runner-linux-x64-2.163.1.tar.gz \
+    && tar xzf ./actions-runner-linux-x64-2.163.1.tar.gz \
+    && ./bin/installdependencies.sh \
+    && dnf clean all
+
+USER developer
+RUN cd /github/actions-runner \
+    && ./config.sh --url https://github.com/avisiedo/sssd --token $TOKEN
+
+ENTRYPOINT /github/actions-runner/run.sh 

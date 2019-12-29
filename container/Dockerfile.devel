@@ -1,0 +1,82 @@
+FROM fedora:latest
+
+MAINTAINER SSSD Maintainers <sssd-maint@redhat.com>
+
+ARG TARBALL
+ARG UID
+
+RUN dnf -y install git openssl sudo curl wget ruby rubygems "rubygem(json)" wget rpm-build dnf-plugins-core libldb-devel && \
+    git clone --depth=50 --branch=master https://github.com/SSSD/sssd.git /tmp/sssd && \
+    cd /tmp/sssd && \
+    ./contrib/fedora/make_srpm.sh && \
+    dnf builddep -y rpmbuild/SRPMS/sssd-*.src.rpm && \
+    dnf -y clean all
+
+RUN dnf -y install autoconf \
+                   automake \
+                   bind-utils \
+                   c-ares-devel \
+                   check-devel \
+                   cifs-utils-devel \
+                   dbus-devel \
+                   dbus-libs \
+                   docbook-style-xsl \
+                   doxygen \
+                   findutils \
+                   gcc \
+                   gdm-pam-extensions-devel \
+                   gettext-devel \
+                   glib2-devel \
+                   gnutls-utils \
+                   jansson-devel \
+                   keyutils-libs-devel \
+                   krb5-devel \
+                   libcmocka-devel \
+                   libcollection-devel \
+                   libdhash-devel \
+                   libini_config-devel\
+                   libldb-devel \
+                   libnfsidmap-devel \
+                   libnl3-devel \
+                   libselinux-devel \
+                   libsemanage-devel \
+                   libsmbclient-devel \
+                   libtalloc-devel \
+                   libtdb-devel \
+                   libtevent-devel \
+                   libtool \
+                   libuuid-devel \
+                   libxml2 \
+                   libxslt \
+                   m4 \
+                   make \
+                   nspr-devel \
+                   nss-devel \
+                   nss-tools \
+                   nss_wrapper \
+                   openldap-devel \
+                   openssh \
+                   openssl \
+                   openssl-devel \
+                   p11-kit-devel \
+                   pam-devel \
+                   pam_wrapper \
+                   pcre-devel \
+                   pkgconfig \
+                   popt-devel \
+                   python3-devel \
+                   samba-winbind \
+                   samba4-devel \
+                   selinux-policy-targeted \
+                   softhsm \
+                   systemd \
+                   systemd-devel \
+                   systemtap-sdt-devel \
+                   uid_wrapper \
+    && dnf -y clean all
+
+RUN groupadd -g $UID developer \
+    && useradd -u $UID -g $UID developer
+
+USER developer
+ENTRYPOINT 
