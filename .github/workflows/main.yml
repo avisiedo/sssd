@@ -13,34 +13,21 @@ jobs:
         ./configure --without-python2-bindings
 
   cppcheck:
+    needs: prepare
     runs-on: [self-hosted]
     steps:
     - name: cppcheck-confdb
-      run: cppcheck --force --enable=information -I ./ -I src/  --std=c99 --enable=all --suppress=missingIncludeSystem --xml confdb 2> junit-cpp-check-confdb.xml
-    - name: publish-cppcheck-confdb-report
-      uses: actions/upload-artifact@v1
-      with:
-        name: cppcheck-confdb-report
-        path: junit-cpp-check-confdb.xml
-
-    - name: cppcheck-db
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml db 2> junit-cpp-check-db.xml
-    - name: cppcheck-krb5_plugin
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml krb5_plugin/ 2> junit-cpp-check-krb5_plugin.xml
-    - name: cppcheck-ldb_modules
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml ldb_modules/ 2> junit-cpp-check-ldb_modules.xml
-    - name: cppcheck-monitor
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml monitor/ 2> junit-cpp-check-monitor.xml
-    - name: p11_child
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml p11_child/ 2> junit-cpp-check-p11_child.xml
-    - name: providers
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml providers/ 2> junit-cpp-check-providers.xml
-    - name: python
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml python/ 2> junit-cpp-check-python.xml
-    - name: resolv
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml resolv/ 2> junit-cpp-check-resolv.xml
-    - name: responder
-      run: cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml responder/ 2> junit-cpp-check-responder.xml
+      run: |
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml confdb/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml db/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml krb5_plugin/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml ldb_modules/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml monitor/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml p11_child/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml providers/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml python/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml resolv/
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml responder/
 
   build:
     needs: prepare
