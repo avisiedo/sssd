@@ -40,5 +40,5 @@ jobs:
     steps:
     - name: Unit Tests
       run: |
-        RET=0; for item in test_*_*; do ./$item || RET=1; done; exit $RET
+        RET=0; LDB_MODULES_PATH=$PWD/ldb_mod_test_dir; LD_LIBRARY_PATH=$PWD/.libs:$LD_LIBRARY_PATH; for item in test_*_*; do ./$item || RET=1; done; exit $RET
       
