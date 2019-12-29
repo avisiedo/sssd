@@ -7,10 +7,11 @@ jobs:
     runs-on: [self-hosted]
     steps:
     - uses: actions/checkout@v1
-    - name: Build
+    - name: Prepare
       run: |
         autoreconf -fi
         ./configure --without-python2-bindings
+
   build:
     needs: prepare
     runs-on: [self-hosted]
@@ -21,22 +22,26 @@ jobs:
         autoreconf -fi
         ./configure --without-python2-bindings
         make all
+
   doc:
     needs: prepare
     runs-on: [self-hosted]
     steps:
     - name: Documentation
       run: make docs
+
   tests:
     needs: build
     runs-on: [self-hosted]
     steps:
     - name: Build tests
       run: make tests
+
   run-tests:
     needs: tests
     runs-on: [self-hosted]
     steps:
     - name: Unit Tests
-      run: echo "Running unit tests"
+      run: |
+        RET=0; for item in test_*_*; do ./$item || RET=1; done; exit $RET
       
