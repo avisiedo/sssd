@@ -4,17 +4,29 @@ on: [push]
 
 jobs:
   build:
-
     runs-on: [self-hosted]
-
     steps:
     - uses: actions/checkout@v1
-    - name: Run a one-line script
-      run: echo Hello, world!
-    - name: Run a multi-line script
+    - name: Build
       run: |
         autoreconf -fi
         ./configure --without-python2-bindings
         make all
-        make doc
-        make tests
+  doc:
+    runs-on: [self-hosted]
+    steps:
+    - name: Documentation
+      run: make doc
+  tests:
+    needs: build
+    run-on: [self-hosted]
+    steps:
+    - name: Build tests
+      run: make tests
+  run-tests:
+    needs: tests
+    run-on: [self-hosted]
+    steps:
+    - name: Unit Tests
+      run: echo "Running unit tests"
+      
