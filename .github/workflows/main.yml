@@ -16,7 +16,7 @@ jobs:
     runs-on: [self-hosted]
     steps:
     - name: Documentation
-      run: make doc
+      run: make docs
   tests:
     needs: build
     runs-on: [self-hosted]
