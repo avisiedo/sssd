@@ -18,16 +18,17 @@ jobs:
     steps:
     - name: cppcheck-confdb
       run: |
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml confdb/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml db/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml krb5_plugin/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml ldb_modules/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml monitor/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml p11_child/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml providers/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml python/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml resolv/
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml responder/
+        mkdir reports
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/confdb/ 2> reports/junit-confdb.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/db/ 2> reports/junit-db.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/krb5_plugin/ 2> reports/junit-krb5_plugin.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/ldb_modules/ 2> reports/junit-ldb_modules.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/monitor/ 2> reports/junit-monitor.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/p11_child/ 2> reports/junit-p11_child.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/providers/ 2> reports/junit-providers.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/python/ 2> reports/junit-python.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/resolv/ 2> reports/junit-resolv.xml
+        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/responder/ 2> reports/junit-responder.xml
 
   build:
     needs: prepare
