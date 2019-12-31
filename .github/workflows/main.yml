@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: cppcheck-confdb
       run: |
-        mkdir reports
+        [ -e reports ] || mkdir reports
         cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/confdb/ 2> reports/junit-confdb.xml
         cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/db/ 2> reports/junit-db.xml
         cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/krb5_plugin/ 2> reports/junit-krb5_plugin.xml
@@ -58,6 +58,7 @@ jobs:
     steps:
     - name: Unit Tests
       run: |
+        [ -e reports ] || mkdir reports
         RET=0
         for item in test_*_*
         do
