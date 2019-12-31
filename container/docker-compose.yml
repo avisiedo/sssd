@@ -6,4 +6,4 @@ services:
       context: ..
       dockerfile: container/Dockerfile.devel
     volumes:
-      - ..:/src:Z 
+      - ..:/sssd:Z 
