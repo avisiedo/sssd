@@ -58,5 +58,11 @@ jobs:
     steps:
     - name: Unit Tests
       run: |
-        RET=0; for item in test_*_*; do echo -e "\n>> $item"; LDB_MODULES_PATH=$PWD/ldb_mod_test_dir LD_LIBRARY_PATH=$PWD/.libs ./$item 1>/tmp/test.out 2>/tmp/test.out || (RET=1; cat /tmp/test.out); done; exit $RET
+        RET=0
+        for item in test_*_*
+        do
+            echo -e "\n>> $item"
+            CMOCKA_MESSAGE_OUTPUT=xml LDB_MODULES_PATH=$PWD/ldb_mod_test_dir LD_LIBRARY_PATH=$PWD/.libs ./$item 1>reports/$item.xml 2>/tmp/test.out || (RET=1; cat /tmp/test.out)
+        done
+        exit $RET
       
