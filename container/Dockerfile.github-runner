@@ -3,6 +3,8 @@ FROM sssd/sssd-devel
 MAINTAINER SSSD Maintainers <sssd-maint@redhat.com>
 
 ARG TOKEN
+ARG UID
+ARG GID
 
 USER root
 
@@ -10,6 +12,7 @@ RUN mkdir -p /github/actions-runner && cd /github/actions-runner \
     && curl -O https://githubassets.azureedge.net/runners/2.163.1/actions-runner-linux-x64-2.163.1.tar.gz \
     && tar xzf ./actions-runner-linux-x64-2.163.1.tar.gz \
     && ./bin/installdependencies.sh \
+    && chown -R $UID:$GID . \
     && dnf clean all
 
 USER developer

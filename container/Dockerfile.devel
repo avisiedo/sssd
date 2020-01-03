@@ -2,8 +2,9 @@ FROM fedora:latest
 
 MAINTAINER SSSD Maintainers <sssd-maint@redhat.com>
 
-ARG TARBALL
+#ARG TARBALL
 ARG UID
+ARG GID
 
 RUN dnf -y install git openssl sudo curl wget ruby rubygems "rubygem(json)" wget rpm-build dnf-plugins-core libldb-devel && \
     git clone --depth=50 --branch=master https://github.com/SSSD/sssd.git /tmp/sssd && \
@@ -76,8 +77,8 @@ RUN dnf -y install autoconf \
                    cppcheck \
     && dnf -y clean all
 
-RUN groupadd -g $UID developer \
-    && useradd -u $UID -g $UID developer
+RUN groupadd -g $GID developer; \
+    useradd -u $UID -g $GID developer
 
 USER developer
 ENTRYPOINT 

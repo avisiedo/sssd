@@ -2,8 +2,16 @@ version: "3.6"
 
 services:
   sssd-devel:
+    image: sssd/sssd-devel
     build:
       context: ..
       dockerfile: container/Dockerfile.devel
     volumes:
-      - ..:/sssd:Z 
+      - ..:/sssd:Z
+  github-runnner:
+    image: sssd/github-runner
+    build:
+      context: ..
+      dockerfile: container/Dockerfile.github-runner
+    volumes:
+      - ..:/sssd:Z

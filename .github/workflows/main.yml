@@ -6,29 +6,30 @@ jobs:
   prepare:
     runs-on: [self-hosted]
     steps:
-    - uses: actions/checkout@v1
-    - name: Prepare
-      run: |
-        autoreconf -fi
-        ./configure --without-python2-bindings
+      - uses: actions/checkout@v1
+      - name: Prepare
+        run: |
+          autoreconf -fi
+          ./configure --without-python2-bindings
 
   cppcheck:
     needs: prepare
     runs-on: [self-hosted]
     steps:
-    - name: cppcheck-confdb
-      run: |
-        [ -e reports ] || mkdir reports
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/confdb/ 2> reports/junit-confdb.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/db/ 2> reports/junit-db.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/krb5_plugin/ 2> reports/junit-krb5_plugin.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/ldb_modules/ 2> reports/junit-ldb_modules.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/monitor/ 2> reports/junit-monitor.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/p11_child/ 2> reports/junit-p11_child.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/providers/ 2> reports/junit-providers.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/python/ 2> reports/junit-python.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/resolv/ 2> reports/junit-resolv.xml
-        cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/responder/ 2> reports/junit-responder.xml
+      - name: cppcheck-confdb
+        run: |
+          [ -e reports ] || mkdir reports
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/confdb/ 2> reports/junit-confdb.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/db/ 2> reports/junit-db.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/krb5_plugin/ 2> reports/junit-krb5_plugin.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/ldb_modules/ 2> reports/junit-ldb_modules.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/monitor/ 2> reports/junit-monitor.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/p11_child/ 2> reports/junit-p11_child.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/providers/ 2> reports/junit-providers.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/python/ 2> reports/junit-python.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/resolv/ 2> reports/junit-resolv.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/responder/ 2> reports/junit-responder.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/responder/ 2> reports/junit-responder.xml
 
   build:
     needs: prepare
@@ -36,34 +37,33 @@ jobs:
     strategy:
       max-parallel: 2
     steps:
-    - uses: actions/checkout@v1
-    - name: Build
-      run: |
-        autoreconf -fi
-        ./configure --without-python2-bindings
-        make all
-    - name: Documentation
-      run: make docs
+      - uses: actions/checkout@v1
+      - name: Build
+        run: |
+          autoreconf -fi
+          ./configure --without-python2-bindings
+          make all
+      - name: Documentation
+        run: make docs
 
   tests:
     needs: build
     runs-on: [self-hosted]
     steps:
-    - name: Build tests
-      run: make tests
+      - name: Build tests
+        run: make tests
 
   run-tests:
     needs: tests
     runs-on: [self-hosted]
     steps:
-    - name: Unit Tests
-      run: |
-        [ -e reports ] || mkdir reports
-        RET=0
-        for item in test_*_*
-        do
-            echo -e "\n>> $item"
-            CMOCKA_MESSAGE_OUTPUT=xml LDB_MODULES_PATH=$PWD/ldb_mod_test_dir LD_LIBRARY_PATH=$PWD/.libs ./$item 1>reports/$item.xml 2>/tmp/test.out || (RET=1; cat /tmp/test.out)
-        done
-        exit $RET
-      
+      - name: Unit Tests
+        run: |
+          [ -e reports ] || mkdir reports
+          RET=0
+          for item in test-* test_*_* *-tests *_test *_tests
+          do
+              echo -e "\n>> $item"
+              CMOCKA_MESSAGE_OUTPUT=xml LDB_MODULES_PATH=$PWD/ldb_mod_test_dir LD_LIBRARY_PATH=$PWD/.libs ./$item 1>reports/$item.xml 2>/tmp/test.out || (RET=1; cat /tmp/test.out)
+          done
+          exit $RET
