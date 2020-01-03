@@ -1,6 +1,10 @@
 #!/bin/bash
 
-
+##
+# Terminate the execution of the script with an error message,
+# and use the last errorcode as return code. If the ret code of
+# the last operation is Zero, then this is set to the value of 127.
+##
 function die
 {
 	local ERR=$?
@@ -9,14 +13,38 @@ function die
 	exit $ERR
 }
 
-
+##
+# Write a warning message for a dependency not found.
+# $* List of dependencies.
+##
 function not-found-dep
 {
-	echo "WARNING: $* was not found." >&2
+	[ $# -eq 1 ] && echo "WARNING: $* was not found." >&2
+	[ $# -gt 1 ] && echo "WARNING: $* were not found." >&2
 	return 0
 }
 
+##
+# Helper to delay a return code which have been got in
+# early steps along the script.
+##
+function delayed-retcode
+{
+	local __retcode="$1"
 
+	re='^[0-9]+$'
+	if ! [[ "$__retcode" =~ $re ]]
+	then
+		die "$__retcode is not a number"
+	fi
+
+	return $__retcode
+}
+
+##
+# Check docker dependencies only, as the rest of tools are
+# inside the docker images.
+##
 function cmd-checkdeps
 {
 	local RET
@@ -25,11 +53,14 @@ function cmd-checkdeps
 	do
 		which "$item" &>/dev/null || ( not-found-dep "$item" && RET=1 )
 	done
-	[ $RET -ne 0 ] && die "ERROR: Dependencies not found."
+	[ $RET -eq 0 ] || delayed-retcode $RET || die "Dependencies not found."
 	echo "All dependencies satisfaid" >&2
+	return 0
 }
 
-
+##
+# Build the docker images.
+##
 function cmd-build
 {
 	local GID
@@ -45,19 +76,26 @@ EOB
 	[ "$*" == "" ] && docker-compose -f container/docker-compose.yml build --build-arg UID=$UID --build-arg GID=$GID --build-arg TOKEN=$TOKEN
 }
 
-
+##
+# Run a command in a container with the development environment.
+# $@ Comand to be run and their arguments.
+##
 function cmd-run
 {
 	docker-compose -f container/docker-compose.yml run -e UID=$UID --rm sssd-devel "$@"
 }
 
-
+##
+# Open a terminal inside the development environment.
+##
 function cmd-shell
 {
 	docker-compose -f container/docker-compose.yml run -e UID=$UID --rm -w /sssd sssd-devel /bin/bash
 }
 
-
+##
+# Execute a command inside a running container.
+##
 function cmd-exec
 {
 	local __options
@@ -98,13 +136,42 @@ function cmd-exec
 	docker-compose exec -f container/docker-compose.yml $__options $__environment $__service $__command "$@"
 }
 
-
+##
+# Run the static analyzer to create a report with potential bugs.
+##
 function cmd-cppcheck
 {
+    local __container
+    local __paths
+	[ -e reports ] || mkdir reports
+
+    __paths=""
+    __paths="$__paths src/db/"
+    __paths="$__paths src/confdb/"
+    __paths="$__paths src/krb5_plugin/"
+    __paths="$__paths src/ldb_modules/"
+    __paths="$__paths src/monitor/"
+    __paths="$__paths src/p11_child/"
+    __paths="$__paths src/providers/"
+    __paths="$__paths src/python/"
+    __paths="$__paths src/resolv/"
+    __paths="$__paths src/responder/"
+    __paths="$__paths src/sbus"
+    __paths="$__paths src/sss_client"
+    __paths="$__paths src/sss_iface"
+    #__paths="$__paths src/tests"
+    __paths="$__paths src/tools"
+    __paths="$__paths src/util"
+
+    docker run --rm -it -v $PWD:/sssd -w /sssd -e CMOCKA_MESSAGE_OUTPUT=xml -e LDB_MODULES_PATH=./ldb_mod_test_dir -e LD_LIBRARY_PATH=./.libs sssd/sssd-devel ./static-analyzer.sh $__paths
 	return 0
 }
 
-
+##
+# Build and run the tests of the project.
+# $@ If no arguments, try to launch all the tests found, else try
+# the list of tests indicated.
+##
 function cmd-tests
 {
     local __container
@@ -138,7 +205,9 @@ function cmd-tests
 	return $RET
 }
 
-
+##
+# Show an overview of the subcommands supported by this helper script.
+##
 function cmd-help
 {
 cat <<EOF

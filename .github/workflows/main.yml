@@ -19,17 +19,7 @@ jobs:
       - name: cppcheck-confdb
         run: |
           [ -e reports ] || mkdir reports
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/confdb/ 2> reports/junit-confdb.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/db/ 2> reports/junit-db.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/krb5_plugin/ 2> reports/junit-krb5_plugin.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/ldb_modules/ 2> reports/junit-ldb_modules.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/monitor/ 2> reports/junit-monitor.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/p11_child/ 2> reports/junit-p11_child.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/providers/ 2> reports/junit-providers.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/python/ 2> reports/junit-python.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/resolv/ 2> reports/junit-resolv.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/responder/ 2> reports/junit-responder.xml
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/responder/ 2> reports/junit-responder.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/db/ src/confdb/ src/krb5_plugin/ src/ldb_modules/ src/monitor/ src/p11_child/ src/providers/ src/python/ src/resolv/ src/responder/ src/sbus/ src/sss_client/ src/sss_iface/ src/tools/ src/util/ 2> reports/cppcheck.xml
 
   build:
     needs: prepare
