@@ -169,7 +169,7 @@ function cmd-cppcheck
     __paths="$__paths src/tools"
     __paths="$__paths src/util"
 
-    docker run --rm -it -v $PWD:/sssd -w /sssd -e CMOCKA_MESSAGE_OUTPUT=xml -e LDB_MODULES_PATH=./ldb_mod_test_dir -e LD_LIBRARY_PATH=./.libs sssd/sssd-devel ./static-analyzer.sh $__paths
+    docker run --rm -it -v $PWD:/sssd -w /sssd -e CMOCKA_MESSAGE_OUTPUT=xml -e LDB_MODULES_PATH=./ldb_mod_test_dir -e LD_LIBRARY_PATH=./.libs sssd/sssd-devel ./scripts/static-analyzer.sh $__paths
 	return 0
 }
 
@@ -203,7 +203,7 @@ function cmd-tests
             [ "$item" == "dlopen-tests" ] && echo "Passing $item" && continue
             [ "$item" == "stress-tests" ] && echo "Passing $item" && continue     # It takes too much time
             echo -e ">> $item"
-            docker exec -it -e CMOCKA_XML_FILE="reports/$item.xml" $__container ./$item && touch reports/.$item.xml
+            docker exec -it $__container ./scripts/generate-test-report.sh ./$item && touch reports/.$item.xml
             RET=$?
             [ $RET -ne 0 ] && break
         done
@@ -211,7 +211,7 @@ function cmd-tests
         for item in "$@"
         do
             echo -e ">> $item"
-            docker exec -it -e CMOCKA_XML_FILE="reports/$item.xml" $__container ./$item 1>reports/$item.xml && touch reports/.$item.xml
+            docker exec -it $__container ./scripts/generate-test-report.sh ./$item && touch reports/.$item.xml
             RET=$?
             [ $RET -ne 0 ] && break
         done
