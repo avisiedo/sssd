@@ -93,6 +93,12 @@ function cmd-shell
 	docker-compose -f container/docker-compose.yml run -e UID=$UID --rm -w /sssd sssd-devel /bin/bash
 }
 
+
+function cmd-rshell
+{
+	docker-compose -f container/docker-compose.yml run -u root -e UID=$UID --rm -w /sssd sssd-devel /bin/bash
+}
+
 ##
 # Execute a command inside a running container.
 ##
@@ -167,6 +173,14 @@ function cmd-cppcheck
 	return 0
 }
 
+function cmd-compile
+{
+	local __container
+    __container="$( docker run -d --rm -v $PWD:/sssd -w /sssd -e CMOCKA_MESSAGE_OUTPUT=xml -e LDB_MODULES_PATH=./ldb_mod_test_dir sssd/sssd-devel sleep 3600 )"
+	docker exec -it $__container autoreconf -vfi && docker exec -it $__container make all tests
+    docker kill $__container
+}
+
 ##
 # Build and run the tests of the project.
 # $@ If no arguments, try to launch all the tests found, else try
@@ -181,6 +195,7 @@ function cmd-tests
 
     if [ "$*" == "" ]
     then
+		# TODO Keep consistency naming the test binaries
         for item in test-* test_*_* *-tests *_test *_tests
         do
             [ -e "reports/.$item.xml" ] && echo "Passing $item" && continue
@@ -188,7 +203,7 @@ function cmd-tests
             [ "$item" == "dlopen-tests" ] && echo "Passing $item" && continue
             [ "$item" == "stress-tests" ] && echo "Passing $item" && continue     # It takes too much time
             echo -e ">> $item"
-            docker exec -it $__container ./$item 1>reports/$item.xml && touch reports/.$item.xml
+            docker exec -it -e CMOCKA_XML_FILE="reports/$item.xml" $__container ./$item && touch reports/.$item.xml
             RET=$?
             [ $RET -ne 0 ] && break
         done
@@ -196,7 +211,7 @@ function cmd-tests
         for item in "$@"
         do
             echo -e ">> $item"
-            docker exec -it $__container ./$item 1>reports/$item.xml && touch reports/.$item.xml
+            docker exec -it -e CMOCKA_XML_FILE="reports/$item.xml" $__container ./$item 1>reports/$item.xml && touch reports/.$item.xml
             RET=$?
             [ $RET -ne 0 ] && break
         done
@@ -218,10 +233,11 @@ Usage: ./helper.sh subcommand ...
     exec       Execute a command inside the container.
     run        Override entrypoint and run a command in a new container.
     shell      Open a shell inside a new container with the dev environment.
+	rshell     Open a root shell.
 
-	cppcheck   Run static analyzer for detecting code smells.
-	compile    Compile project inside the development container.
-	docs       Generate documentation.
+    cppcheck   Run static analyzer for detecting code smells.
+    compile    Compile project inside the development container.
+    docs       Generate documentation.
     tests      Build tests and run all of them.
 EOF
 	return 0
@@ -232,7 +248,7 @@ SUBCOMMAND="$1"
 shift
 
 case "$SUBCOMMAND" in
-	"help" | "build" | "exec" | "run" | "shell" | "checkdeps" )
+	"help" | "build" | "exec" | "run" | "shell" | "rshell" | "checkdeps" )
 		cmd-$SUBCOMMAND "$@"
 		;;
 	"cppcheck" | "tests" | "compile" )
@@ -243,6 +259,6 @@ case "$SUBCOMMAND" in
 		die "No subcommand was specified."
 		;;
 	* )
-		die "Subcommand $SUBCOMMAND is not recognized."
+		die "'$SUBCOMMAND' is not a recognized subcommand."
 		;;
 esac

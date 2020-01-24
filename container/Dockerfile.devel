@@ -75,6 +75,7 @@ RUN dnf -y install autoconf \
                    systemtap-sdt-devel \
                    uid_wrapper \
                    cppcheck \
+                   redhat-lsb-core \
     && dnf -y clean all
 
 RUN groupadd -g $GID developer; \
