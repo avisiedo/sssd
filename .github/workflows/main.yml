@@ -19,7 +19,7 @@ jobs:
       - name: cppcheck-confdb
         run: |
           [ -e reports ] || mkdir reports
-          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml src/db/ src/confdb/ src/krb5_plugin/ src/ldb_modules/ src/monitor/ src/p11_child/ src/providers/ src/python/ src/resolv/ src/responder/ src/sbus/ src/sss_client/ src/sss_iface/ src/tools/ src/util/ 2> reports/cppcheck.xml
+          cppcheck --force --enable=information -I ./ -I src/ --std=c99 --enable=all --suppress=missingIncludeSystem --xml-version=2 src/db/ src/confdb/ src/krb5_plugin/ src/ldb_modules/ src/monitor/ src/p11_child/ src/providers/ src/python/ src/resolv/ src/responder/ src/sbus/ src/sss_client/ src/sss_iface/ src/tools/ src/util/ 2>reports/cppcheck.xml
 
   build:
     needs: prepare
