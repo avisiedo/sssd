@@ -55,8 +55,11 @@ class Notification {
   }
 
   private def send(status, message, context, url) {
+    // A token need to be created for the repository with the needed
+    // permissions to allow the notifications works.
+    // Use that token as password for the credentials used to access
+    // to the GitHub repository.
     this.pipeline.githubNotify status: status,
-      credentialsId: 'sssd-github',
       context: context,
       description: message,
       targetUrl: url
