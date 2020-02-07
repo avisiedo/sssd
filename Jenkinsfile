@@ -56,6 +56,7 @@ class Notification {
 
   private def send(status, message, context, url) {
     this.pipeline.githubNotify status: status,
+      credentialsId: 'sssd-github',
       context: context,
       description: message,
       targetUrl: url
