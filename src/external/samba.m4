@@ -57,10 +57,20 @@ them. In this case, you will need to execute configure script with argument
 
         AC_MSG_CHECKING([Samba's idmap plugin interface version])
         sambalibdir="`$PKG_CONFIG --variable=libdir smbclient`"/samba
+        if test -e $sambalibdir/libidmap.so.*; then
+            # Debian system name the library differently
+            sambalib="$( eval printf "%s" "${sambalibdir}/libidmap.so.*" )"
+            # As no .so soft link exist, we need to reference the name explicitely
+            sambalib=":$( basename "$sambalib" )"
+        elif test -e $sambalibdir/libidmap-samba4.so; then
+            sambalib="idmap-samba4"
+        else
+            AC_MSG_ERROR([Can not find libidmap or libidmap-samba4])
+        fi
         SAVE_CFLAGS=$CFLAGS
         SAVE_LIBS=$LIBS
         CFLAGS="$CFLAGS $SMBCLIENT_CFLAGS $NDR_NBT_CFLAGS $NDR_KRB5PAC_CFLAGS"
-        LIBS="$LIBS -L${sambalibdir} -lidmap-samba4 -Wl,-rpath ${sambalibdir}"
+        LIBS="$LIBS -L${sambalibdir} -l${sambalib} -Wl,-rpath ${sambalibdir}"
         AC_RUN_IFELSE(
             [AC_LANG_SOURCE([
 #include <stdlib.h>
